@@ -36,10 +36,6 @@ jobs:
             target: x86_64-apple-darwin
           - os: macos-latest
             target: aarch64-apple-darwin
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-          - os: windows-latest
-            target: aarch64-pc-windows-msvc
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -93,12 +89,6 @@ jobs:
             -C target/${{ matrix.target }}/release/ querypath |
             gzip --best > \
             querypath-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.tar.gz
-      - name: Package (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          7z a querypath-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.zip `
-            CHANGELOG.md LICENSE README.md ./man/ ./contrib/completions/ `
-            ./target/${{ matrix.target }}/release/querypath.exe
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -106,7 +96,6 @@ jobs:
           path: |
             *.deb
             *.tar.gz
-            *.zip
       - name: Create release
         if: |
           github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'chore(release)')
@@ -116,6 +105,5 @@ jobs:
           files: |
             *.deb
             *.tar.gz
-            *.zip
           name: ${{ steps.get_version.outputs.value }}
           tag_name: ""
