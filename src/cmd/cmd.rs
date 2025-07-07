@@ -12,7 +12,7 @@ impl IntoResettable<StyledStr> for HelpTemplate {
         color_print::cstr!("\
 {before-help}<bold><underline>{name} {version}</underline></bold>
 {author}
-https://github.com/ajeetdsouza/zoxide
+https://github.com/dimarogiv/querypath
 
 {about}
 
@@ -22,12 +22,12 @@ https://github.com/ajeetdsouza/zoxide
 {all-args}{after-help}
 
 <bold><underline>Environment variables:</underline></bold>
-{tab}<bold>_ZO_DATA_DIR</bold>        {tab}Path for zoxide data files
-{tab}<bold>_ZO_ECHO</bold>            {tab}Print the matched directory before navigating to it when set to 1
-{tab}<bold>_ZO_EXCLUDE_DIRS</bold>    {tab}List of directory globs to be excluded
-{tab}<bold>_ZO_FZF_OPTS</bold>        {tab}Custom flags to pass to fzf
-{tab}<bold>_ZO_MAXAGE</bold>          {tab}Maximum total age after which entries start getting deleted
-{tab}<bold>_ZO_RESOLVE_SYMLINKS</bold>{tab}Resolve symlinks when storing paths").into_resettable()
+{tab}<bold>_QP_DATA_DIR</bold>        {tab}Path for querypath data files
+{tab}<bold>_QP_ECHO</bold>            {tab}Print the matched directory before navigating to it when set to 1
+{tab}<bold>_QP_EXCLUDE_DIRS</bold>    {tab}List of directory globs to be excluded
+{tab}<bold>_QP_FZF_OPTS</bold>        {tab}Custom flags to pass to fzf
+{tab}<bold>_QP_MAXAGE</bold>          {tab}Maximum total age after which entries start getting deleted
+{tab}<bold>_QP_RESOLVE_SYMLINKS</bold>{tab}Resolve symlinks when storing paths").into_resettable()
     }
 }
 
@@ -124,7 +124,7 @@ pub struct Init {
     #[clap(value_enum)]
     pub shell: InitShell,
 
-    /// Prevents zoxide from defining the `z` and `zi` commands
+    /// Prevents querypath from defining the `z` and `zi` commands
     #[clap(long, alias = "no-aliases")]
     pub no_cmd: bool,
 
@@ -132,7 +132,7 @@ pub struct Init {
     #[clap(long, default_value = "z")]
     pub cmd: String,
 
-    /// Changes how often zoxide increments a directory's score
+    /// Changes how often querypath increments a directory's score
     #[clap(value_enum, long, default_value = "pwd")]
     pub hook: InitHook,
 }

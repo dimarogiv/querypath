@@ -90,15 +90,15 @@ jobs:
         run: |
           tar -cv CHANGELOG.md LICENSE README.md man/ \
             -C contrib/ completions/ -C ../ \
-            -C target/${{ matrix.target }}/release/ zoxide |
+            -C target/${{ matrix.target }}/release/ querypath |
             gzip --best > \
-            zoxide-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.tar.gz
+            querypath-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.tar.gz
       - name: Package (Windows)
         if: runner.os == 'Windows'
         run: |
-          7z a zoxide-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.zip `
+          7z a querypath-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.zip `
             CHANGELOG.md LICENSE README.md ./man/ ./contrib/completions/ `
-            ./target/${{ matrix.target }}/release/zoxide.exe
+            ./target/${{ matrix.target }}/release/querypath.exe
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

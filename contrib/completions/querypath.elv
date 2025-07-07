@@ -2,14 +2,14 @@
 use builtin;
 use str;
 
-set edit:completion:arg-completer[zoxide] = {|@words|
+set edit:completion:arg-completer[querypath] = {|@words|
     fn spaces {|n|
         builtin:repeat $n ' ' | str:join ''
     }
     fn cand {|text desc|
         edit:complex-candidate $text &display=$text' '(spaces (- 14 (wcswidth $text)))$desc
     }
-    var command = 'zoxide'
+    var command = 'querypath'
     for word $words[1..-1] {
         if (str:has-prefix $word '-') {
             break
@@ -17,7 +17,7 @@ set edit:completion:arg-completer[zoxide] = {|@words|
         set command = $command';'$word
     }
     var completions = [
-        &'zoxide'= {
+        &'querypath'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
@@ -29,7 +29,7 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand query 'Search for a directory in the database'
             cand remove 'Remove a directory from the database'
         }
-        &'zoxide;add'= {
+        &'querypath;add'= {
             cand -s 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
             cand --score 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
             cand -h 'Print help'
@@ -37,7 +37,7 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'zoxide;edit'= {
+        &'querypath;edit'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
@@ -47,31 +47,31 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand increment 'increment'
             cand reload 'reload'
         }
-        &'zoxide;edit;decrement'= {
+        &'querypath;edit;decrement'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'zoxide;edit;delete'= {
+        &'querypath;edit;delete'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'zoxide;edit;increment'= {
+        &'querypath;edit;increment'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'zoxide;edit;reload'= {
+        &'querypath;edit;reload'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'zoxide;import'= {
+        &'querypath;import'= {
             cand --from 'Application to import from'
             cand --merge 'Merge into existing database'
             cand -h 'Print help'
@@ -79,16 +79,16 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'zoxide;init'= {
+        &'querypath;init'= {
             cand --cmd 'Changes the prefix of the `z` and `zi` commands'
-            cand --hook 'Changes how often zoxide increments a directory''s score'
-            cand --no-cmd 'Prevents zoxide from defining the `z` and `zi` commands'
+            cand --hook 'Changes how often querypath increments a directory''s score'
+            cand --no-cmd 'Prevents querypath from defining the `z` and `zi` commands'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'zoxide;query'= {
+        &'querypath;query'= {
             cand --exclude 'Exclude the current directory'
             cand -a 'Show unavailable directories'
             cand --all 'Show unavailable directories'
@@ -103,7 +103,7 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand -V 'Print version'
             cand --version 'Print version'
         }
-        &'zoxide;remove'= {
+        &'querypath;remove'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

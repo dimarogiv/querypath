@@ -6,7 +6,7 @@ on:
     - cron: "0 0 * * *" # daily at 00:00
 jobs:
   no-response:
-    if: github.repository == 'ajeetdsouza/zoxide'
+    if: github.repository == 'dimarogiv/querypath'
     permissions:
       issues: write
     runs-on: ubuntu-latest

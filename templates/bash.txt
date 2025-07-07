@@ -4,11 +4,11 @@
 # shellcheck shell=bash
 
 {{ section }}
-# Utility functions for zoxide.
+# Utility functions for querypath.
 #
 
-# pwd based on the value of _ZO_RESOLVE_SYMLINKS.
-function __zoxide_pwd() {
+# pwd based on the value of _QP_RESOLVE_SYMLINKS.
+function __querypath_pwd() {
 {%- if cfg!(windows) %}
     \command cygpath -w "$(\builtin pwd -P)"
 {%- else if resolve_symlinks %}
@@ -18,113 +18,113 @@ function __zoxide_pwd() {
 {%- endif %}
 }
 
-# cd + custom logic based on the value of _ZO_ECHO.
-function __zoxide_cd() {
+# cd + custom logic based on the value of _QP_ECHO.
+function __querypath_cd() {
     # shellcheck disable=SC2164
-    \builtin cd -- "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
+    \builtin cd -- "$@" {%- if echo %} && __querypath_pwd {%- endif %}
 }
 
 {{ section }}
-# Hook configuration for zoxide.
+# Hook configuration for querypath.
 #
 {%- if hook != InitHook::None %}
 
 # Hook to add new entries to the database.
 {%- if hook == InitHook::Prompt %}
-function __zoxide_hook() {
+function __querypath_hook() {
     \builtin local -r retval="$?"
     # shellcheck disable=SC2312
-    \command zoxide add -- "$(__zoxide_pwd)"
+    \command querypath add -- "$(__querypath_pwd)"
     return "${retval}"
 }
 
 {%- else if hook == InitHook::Pwd %}
-__zoxide_oldpwd="$(__zoxide_pwd)"
+__querypath_oldpwd="$(__querypath_pwd)"
 
-function __zoxide_hook() {
+function __querypath_hook() {
     \builtin local -r retval="$?"
     \builtin local pwd_tmp
-    pwd_tmp="$(__zoxide_pwd)"
-    if [[ ${__zoxide_oldpwd} != "${pwd_tmp}" ]]; then
-        __zoxide_oldpwd="${pwd_tmp}"
-        \command zoxide add -- "${__zoxide_oldpwd}"
+    pwd_tmp="$(__querypath_pwd)"
+    if [[ ${__querypath_oldpwd} != "${pwd_tmp}" ]]; then
+        __querypath_oldpwd="${pwd_tmp}"
+        \command querypath add -- "${__querypath_oldpwd}"
     fi
     return "${retval}"
 }
 {%- endif %}
 
 # Initialize hook.
-if [[ ${PROMPT_COMMAND:=} != *'__zoxide_hook'* ]]; then
-    PROMPT_COMMAND="__zoxide_hook;${PROMPT_COMMAND#;}"
+if [[ ${PROMPT_COMMAND:=} != *'__querypath_hook'* ]]; then
+    PROMPT_COMMAND="__querypath_hook;${PROMPT_COMMAND#;}"
 fi
 
 {%- endif %}
 
 # Report common issues.
-function __zoxide_doctor() {
+function __querypath_doctor() {
 {%- if hook == InitHook::None %}
     return 0
 
 {%- else %}
-    [[ ${_ZO_DOCTOR:-1} -eq 0 ]] && return 0
+    [[ ${_QP_DOCTOR:-1} -eq 0 ]] && return 0
     # shellcheck disable=SC2199
-    [[ ${PROMPT_COMMAND[@]:-} == *'__zoxide_hook'* ]] && return 0
+    [[ ${PROMPT_COMMAND[@]:-} == *'__querypath_hook'* ]] && return 0
     # shellcheck disable=SC2199
-    [[ ${__vsc_original_prompt_command[@]:-} == *'__zoxide_hook'* ]] && return 0
+    [[ ${__vsc_original_prompt_command[@]:-} == *'__querypath_hook'* ]] && return 0
 
-    _ZO_DOCTOR=0
+    _QP_DOCTOR=0
     \builtin printf '%s\n' \
-        'zoxide: detected a possible configuration issue.' \
-        'Please ensure that zoxide is initialized right at the end of your shell configuration file (usually ~/.bashrc).' \
+        'querypath: detected a possible configuration issue.' \
+        'Please ensure that querypath is initialized right at the end of your shell configuration file (usually ~/.bashrc).' \
         '' \
         'If the issue persists, consider filing an issue at:' \
-        'https://github.com/ajeetdsouza/zoxide/issues' \
+        'https://github.com/dimarogiv/querypath/issues' \
         '' \
-        'Disable this message by setting _ZO_DOCTOR=0.' \
+        'Disable this message by setting _QP_DOCTOR=0.' \
         '' >&2
 {%- endif %}
 }
 
 {{ section }}
-# When using zoxide with --no-cmd, alias these internal functions as desired.
+# When using querypath with --no-cmd, alias these internal functions as desired.
 #
 
-__zoxide_z_prefix='z#'
+__querypath_z_prefix='z#'
 
 # Jump to a directory using only keywords.
-function __zoxide_z() {
-    __zoxide_doctor
+function __querypath_z() {
+    __querypath_doctor
 
     # shellcheck disable=SC2199
     if [[ $# -eq 0 ]]; then
-        __zoxide_cd ~
+        __querypath_cd ~
     elif [[ $# -eq 1 && $1 == '-' ]]; then
-        __zoxide_cd "${OLDPWD}"
+        __querypath_cd "${OLDPWD}"
     elif [[ $# -eq 1 && -d $1 ]]; then
-        __zoxide_cd "$1"
+        __querypath_cd "$1"
     elif [[ $# -eq 2 && $1 == '--' ]]; then
-        __zoxide_cd "$2"
-    elif [[ ${@: -1} == "${__zoxide_z_prefix}"?* ]]; then
+        __querypath_cd "$2"
+    elif [[ ${@: -1} == "${__querypath_z_prefix}"?* ]]; then
         # shellcheck disable=SC2124
         \builtin local result="${@: -1}"
-        __zoxide_cd "{{ "${result:${#__zoxide_z_prefix}}" }}"
+        __querypath_cd "{{ "${result:${#__querypath_z_prefix}}" }}"
     else
         \builtin local result
         # shellcheck disable=SC2312
-        result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" &&
-            __zoxide_cd "${result}"
+        result="$(\command querypath query --exclude "$(__querypath_pwd)" -- "$@")" &&
+            __querypath_cd "${result}"
     fi
 }
 
 # Jump to a directory using interactive search.
-function __zoxide_zi() {
-    __zoxide_doctor
+function __querypath_zi() {
+    __querypath_doctor
     \builtin local result
-    result="$(\command zoxide query --interactive -- "$@")" && __zoxide_cd "${result}"
+    result="$(\command querypath query --interactive -- "$@")" && __querypath_cd "${result}"
 }
 
 {{ section }}
-# Commands for zoxide. Disable these using --no-cmd.
+# Commands for querypath. Disable these using --no-cmd.
 #
 
 {%- match cmd %}
@@ -132,12 +132,12 @@ function __zoxide_zi() {
 
 \builtin unalias {{cmd}} &>/dev/null || \builtin true
 function {{cmd}}() {
-    __zoxide_z "$@"
+    __querypath_z "$@"
 }
 
 \builtin unalias {{cmd}}i &>/dev/null || \builtin true
 function {{cmd}}i() {
-    __zoxide_zi "$@"
+    __querypath_zi "$@"
 }
 
 # Load completions.
@@ -148,14 +148,14 @@ function {{cmd}}i() {
 if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VERSINFO[0]:-0} -ge 5 ]] &&
     [[ :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
 
-    function __zoxide_z_complete_helper() {
-        READLINE_LINE="{{ cmd }} ${__zoxide_result@Q}"
+    function __querypath_z_complete_helper() {
+        READLINE_LINE="{{ cmd }} ${__querypath_result@Q}"
         READLINE_POINT={{ "${#READLINE_LINE}" }}
         bind '"\e[0n": accept-line'
         \builtin printf '\e[5n' >/dev/tty
     }
 
-    function __zoxide_z_complete() {
+    function __querypath_z_complete() {
         # Only show completions when the cursor is at the end of the line.
         [[ {{ "${#COMP_WORDS[@]}" }} -eq $((COMP_CWORD + 1)) ]] || return
 
@@ -167,22 +167,22 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
         # If there is a space after the last word, use interactive selection.
         elif [[ -z ${COMP_WORDS[-1]} ]]; then
             # shellcheck disable=SC2312
-            __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd)" --interactive -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" && {
+            __querypath_result="$(\command querypath query --exclude "$(__querypath_pwd)" --interactive -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" && {
                 # In case the terminal does not respond to \e[5n or another
                 # mechanism steals the response, it is still worth completing
                 # the directory in the command line.
-                COMPREPLY=("${__zoxide_z_prefix}${__zoxide_result}/")
+                COMPREPLY=("${__querypath_z_prefix}${__querypath_result}/")
 
                 # Note: We here call "bind" without prefixing "\builtin" to be
                 # compatible with frameworks like ble.sh, which emulates Bash's
                 # builtin "bind".
-                bind -x '"\e[0n": __zoxide_z_complete_helper'
+                bind -x '"\e[0n": __querypath_z_complete_helper'
                 \builtin printf '\e[5n' >/dev/tty
             }
         fi
     }
 
-    \builtin complete -F __zoxide_z_complete -o filenames -- {{cmd}}
+    \builtin complete -F __querypath_z_complete -o filenames -- {{cmd}}
     \builtin complete -r {{cmd}}i &>/dev/null || \builtin true
 fi
 
@@ -193,6 +193,6 @@ fi
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide, add this to your shell configuration file (usually ~/.bashrc):
+# To initialize querypath, add this to your shell configuration file (usually ~/.bashrc):
 #
-# eval "$(zoxide init bash)"
+# eval "$(querypath init bash)"

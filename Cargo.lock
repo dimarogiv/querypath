@@ -967,7 +967,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "zoxide"
+name = "querypath"
 version = "0.9.8"
 dependencies = [
  "anyhow",

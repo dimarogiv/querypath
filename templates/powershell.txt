@@ -2,31 +2,31 @@
 {%- let not_configured = "# -- not configured --" -%}
 
 {{ section }}
-# Utility functions for zoxide.
+# Utility functions for querypath.
 #
 
-# Call zoxide binary, returning the output as UTF-8.
-function global:__zoxide_bin {
+# Call querypath binary, returning the output as UTF-8.
+function global:__querypath_bin {
     $encoding = [Console]::OutputEncoding
     try {
         [Console]::OutputEncoding = [System.Text.Utf8Encoding]::new()
-        $result = zoxide @args
+        $result = querypath @args
         return $result
     } finally {
         [Console]::OutputEncoding = $encoding
     }
 }
 
-# pwd based on zoxide's format.
-function global:__zoxide_pwd {
+# pwd based on querypath's format.
+function global:__querypath_pwd {
     $cwd = Get-Location
     if ($cwd.Provider.Name -eq "FileSystem") {
         $cwd.ProviderPath
     }
 }
 
-# cd + custom logic based on the value of _ZO_ECHO.
-function global:__zoxide_cd($dir, $literal) {
+# cd + custom logic based on the value of _QP_ECHO.
+function global:__querypath_cd($dir, $literal) {
     $dir = if ($literal) {
         Set-Location -LiteralPath $dir -Passthru -ErrorAction Stop
     } else {
@@ -46,7 +46,7 @@ function global:__zoxide_cd($dir, $literal) {
 }
 
 {{ section }}
-# Hook configuration for zoxide.
+# Hook configuration for querypath.
 #
 
 {% if hook == InitHook::None -%}
@@ -54,95 +54,95 @@ function global:__zoxide_cd($dir, $literal) {
 
 {%- else -%}
 {#-
-  Initialize $__zoxide_hooked if it does not exist. Removing this will cause an
+  Initialize $__querypath_hooked if it does not exist. Removing this will cause an
   unset variable error in StrictMode.
 -#}
 {%- if hook == InitHook::Prompt -%}
 # Hook to add new entries to the database.
-function global:__zoxide_hook {
-    $result = __zoxide_pwd
+function global:__querypath_hook {
+    $result = __querypath_pwd
     if ($null -ne $result) {
-        zoxide add "--" $result
+        querypath add "--" $result
     }
 }
 {%- else if hook == InitHook::Pwd -%}
 # Hook to add new entries to the database.
-$global:__zoxide_oldpwd = __zoxide_pwd
-function global:__zoxide_hook {
-    $result = __zoxide_pwd
-    if ($result -ne $global:__zoxide_oldpwd) {
+$global:__querypath_oldpwd = __querypath_pwd
+function global:__querypath_hook {
+    $result = __querypath_pwd
+    if ($result -ne $global:__querypath_oldpwd) {
         if ($null -ne $result) {
-            zoxide add "--" $result
+            querypath add "--" $result
         }
-        $global:__zoxide_oldpwd = $result
+        $global:__querypath_oldpwd = $result
     }
 }
 {%- endif %}
 
 # Initialize hook.
-$global:__zoxide_hooked = (Get-Variable __zoxide_hooked -ErrorAction Ignore -ValueOnly)
-if ($global:__zoxide_hooked -ne 1) {
-    $global:__zoxide_hooked = 1
-    $global:__zoxide_prompt_old = $function:prompt
+$global:__querypath_hooked = (Get-Variable __querypath_hooked -ErrorAction Ignore -ValueOnly)
+if ($global:__querypath_hooked -ne 1) {
+    $global:__querypath_hooked = 1
+    $global:__querypath_prompt_old = $function:prompt
 
     function global:prompt {
-        if ($null -ne $__zoxide_prompt_old) {
-            & $__zoxide_prompt_old
+        if ($null -ne $__querypath_prompt_old) {
+            & $__querypath_prompt_old
         }
-        $null = __zoxide_hook
+        $null = __querypath_hook
     }
 }
 {%- endif %}
 
 {{ section }}
-# When using zoxide with --no-cmd, alias these internal functions as desired.
+# When using querypath with --no-cmd, alias these internal functions as desired.
 #
 
 # Jump to a directory using only keywords.
-function global:__zoxide_z {
+function global:__querypath_z {
     if ($args.Length -eq 0) {
-        __zoxide_cd ~ $true
+        __querypath_cd ~ $true
     }
     elseif ($args.Length -eq 1 -and ($args[0] -eq '-' -or $args[0] -eq '+')) {
-        __zoxide_cd $args[0] $false
+        __querypath_cd $args[0] $false
     }
     elseif ($args.Length -eq 1 -and (Test-Path -PathType Container -LiteralPath $args[0])) {
-        __zoxide_cd $args[0] $true
+        __querypath_cd $args[0] $true
     }
     elseif ($args.Length -eq 1 -and (Test-Path -PathType Container -Path $args[0] )) {
-        __zoxide_cd $args[0] $false
+        __querypath_cd $args[0] $false
     }
     else {
-        $result = __zoxide_pwd
+        $result = __querypath_pwd
         if ($null -ne $result) {
-            $result = __zoxide_bin query --exclude $result "--" @args
+            $result = __querypath_bin query --exclude $result "--" @args
         }
         else {
-            $result = __zoxide_bin query "--" @args
+            $result = __querypath_bin query "--" @args
         }
         if ($LASTEXITCODE -eq 0) {
-            __zoxide_cd $result $true
+            __querypath_cd $result $true
         }
     }
 }
 
 # Jump to a directory using interactive search.
-function global:__zoxide_zi {
-    $result = __zoxide_bin query -i "--" @args
+function global:__querypath_zi {
+    $result = __querypath_bin query -i "--" @args
     if ($LASTEXITCODE -eq 0) {
-        __zoxide_cd $result $true
+        __querypath_cd $result $true
     }
 }
 
 {{ section }}
-# Commands for zoxide. Disable these using --no-cmd.
+# Commands for querypath. Disable these using --no-cmd.
 #
 
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-Set-Alias -Name {{cmd}} -Value __zoxide_z -Option AllScope -Scope Global -Force
-Set-Alias -Name {{cmd}}i -Value __zoxide_zi -Option AllScope -Scope Global -Force
+Set-Alias -Name {{cmd}} -Value __querypath_z -Option AllScope -Scope Global -Force
+Set-Alias -Name {{cmd}}i -Value __querypath_zi -Option AllScope -Scope Global -Force
 
 {%- when None %}
 
@@ -151,7 +151,7 @@ Set-Alias -Name {{cmd}}i -Value __zoxide_zi -Option AllScope -Scope Global -Forc
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide, add this to your configuration (find it by running
+# To initialize querypath, add this to your configuration (find it by running
 # `echo $profile` in PowerShell):
 #
-# Invoke-Expression (& { (zoxide init powershell | Out-String) })
+# Invoke-Expression (& { (querypath init powershell | Out-String) })

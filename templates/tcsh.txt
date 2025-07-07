@@ -9,57 +9,57 @@
 {%- endif -%}
 
 {{ section }}
-# Hook configuration for zoxide.
+# Hook configuration for querypath.
 #
 {%- if hook != InitHook::None %}
 
 # Hook to add new entries to the database.
 {%- if hook == InitHook::Prompt %}
-alias __zoxide_hook 'zoxide add -- "`{{ pwd_cmd }}`"'
+alias __querypath_hook 'querypath add -- "`{{ pwd_cmd }}`"'
 
 {%- else if hook == InitHook::Pwd %}
-set __zoxide_pwd_old = `{{ pwd_cmd }}`
-alias __zoxide_hook 'set __zoxide_pwd_tmp = "`{{ pwd_cmd }}`"; test "$__zoxide_pwd_tmp" != "$__zoxide_pwd_old" && zoxide add -- "$__zoxide_pwd_tmp"; set __zoxide_pwd_old = "$__zoxide_pwd_tmp"'
+set __querypath_pwd_old = `{{ pwd_cmd }}`
+alias __querypath_hook 'set __querypath_pwd_tmp = "`{{ pwd_cmd }}`"; test "$__querypath_pwd_tmp" != "$__querypath_pwd_old" && querypath add -- "$__querypath_pwd_tmp"; set __querypath_pwd_old = "$__querypath_pwd_tmp"'
 {%- endif %}
 
 # Initialize hook.
-alias precmd ';__zoxide_hook'
+alias precmd ';__querypath_hook'
 
 {%- endif %}
 
 {{ section }}
-# When using zoxide with --no-cmd, alias these internal functions as desired.
+# When using querypath with --no-cmd, alias these internal functions as desired.
 #
 
 # Jump to a directory using only keywords.
-alias __zoxide_z 'set __zoxide_args = (\!*)\
-if ("$#__zoxide_args" == 0) then\
+alias __querypath_z 'set __querypath_args = (\!*)\
+if ("$#__querypath_args" == 0) then\
     cd ~\
 else\
-    if ("$#__zoxide_args" == 1 && "$__zoxide_args[1]" == "-") then\
+    if ("$#__querypath_args" == 1 && "$__querypath_args[1]" == "-") then\
         cd -\
-    else if ("$#__zoxide_args" == 1 && -d "$__zoxide_args[1]") then\
-        cd "$__zoxide_args[1]"\
+    else if ("$#__querypath_args" == 1 && -d "$__querypath_args[1]") then\
+        cd "$__querypath_args[1]"\
     else\
-        set __zoxide_pwd = `{{ pwd_cmd }}`\
-        set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' -- $__zoxide_args`" && cd "$__zoxide_result"\
+        set __querypath_pwd = `{{ pwd_cmd }}`\
+        set __querypath_result = "`querypath query --exclude '"'"'$__querypath_pwd'"'"' -- $__querypath_args`" && cd "$__querypath_result"\
     endif\
 endif'
 
 # Jump to a directory using interactive search.
-alias __zoxide_zi 'set __zoxide_args = (\!*)\
-set __zoxide_pwd = `{{ pwd_cmd }}`\
-set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' --interactive -- $__zoxide_args`" && cd "$__zoxide_result"'
+alias __querypath_zi 'set __querypath_args = (\!*)\
+set __querypath_pwd = `{{ pwd_cmd }}`\
+set __querypath_result = "`querypath query --exclude '"'"'$__querypath_pwd'"'"' --interactive -- $__querypath_args`" && cd "$__querypath_result"'
 
 {{ section }}
-# Commands for zoxide. Disable these using --no-cmd.
+# Commands for querypath. Disable these using --no-cmd.
 #
 
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-alias {{cmd}} __zoxide_z
-alias {{cmd}}i __zoxide_zi
+alias {{cmd}} __querypath_z
+alias {{cmd}}i __querypath_zi
 
 {%- when None %}
 
@@ -68,7 +68,7 @@ alias {{cmd}}i __zoxide_zi
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide, add this to your shell configuration file (usually ~/.tcshrc):
+# To initialize querypath, add this to your shell configuration file (usually ~/.tcshrc):
 #
-#     zoxide init tcsh > ~/.zoxide.tcsh
-#     source ~/.zoxide.tcsh
+#     querypath init tcsh > ~/.querypath.tcsh
+#     source ~/.querypath.tcsh

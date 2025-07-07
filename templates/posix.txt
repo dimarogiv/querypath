@@ -4,11 +4,11 @@
 # shellcheck shell=sh
 
 {{ section }}
-# Utility functions for zoxide.
+# Utility functions for querypath.
 #
 
-# pwd based on the value of _ZO_RESOLVE_SYMLINKS.
-__zoxide_pwd() {
+# pwd based on the value of _QP_RESOLVE_SYMLINKS.
+__querypath_pwd() {
 {%- if cfg!(windows) %}
     \command cygpath -w "$(\builtin pwd -P)"
 {%- else if resolve_symlinks %}
@@ -18,14 +18,14 @@ __zoxide_pwd() {
 {%- endif %}
 }
 
-# cd + custom logic based on the value of _ZO_ECHO.
-__zoxide_cd() {
+# cd + custom logic based on the value of _QP_ECHO.
+__querypath_cd() {
     # shellcheck disable=SC2164
-    \command cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
+    \command cd "$@" {%- if echo %} && __querypath_pwd {%- endif %}
 }
 
 {{ section }}
-# Hook configuration for zoxide.
+# Hook configuration for querypath.
 #
 
 {% match hook %}
@@ -34,80 +34,80 @@ __zoxide_cd() {
 
 {%- when InitHook::Prompt -%}
 # Hook to add new entries to the database.
-__zoxide_hook() {
-    \command zoxide add -- "$(__zoxide_pwd || \builtin true)"
+__querypath_hook() {
+    \command querypath add -- "$(__querypath_pwd || \builtin true)"
 }
 
 # Initialize hook.
-if [ "${PS1:=}" = "${PS1#*\$(__zoxide_hook)}" ]; then
-    PS1="${PS1}\$(__zoxide_hook)"
+if [ "${PS1:=}" = "${PS1#*\$(__querypath_hook)}" ]; then
+    PS1="${PS1}\$(__querypath_hook)"
 fi
 
 # Report common issues.
-__zoxide_doctor() {
+__querypath_doctor() {
 {%- if hook != InitHook::Prompt %}
     return 0
 {%- else %}
-    [ "${_ZO_DOCTOR:-1}" -eq 0 ] && return 0
+    [ "${_QP_DOCTOR:-1}" -eq 0 ] && return 0
     case "${PS1:-}" in
-    *__zoxide_hook*) return 0 ;;
+    *__querypath_hook*) return 0 ;;
     *) ;;
     esac
 
-    _ZO_DOCTOR=0
+    _QP_DOCTOR=0
     \command printf '%s\n' \
-        'zoxide: detected a possible configuration issue.' \
-        'Please ensure that zoxide is initialized right at the end of your shell configuration file.' \
+        'querypath: detected a possible configuration issue.' \
+        'Please ensure that querypath is initialized right at the end of your shell configuration file.' \
         '' \
         'If the issue persists, consider filing an issue at:' \
-        'https://github.com/ajeetdsouza/zoxide/issues' \
+        'https://github.com/dimarogiv/querypath/issues' \
         '' \
-        'Disable this message by setting _ZO_DOCTOR=0.' \
+        'Disable this message by setting _QP_DOCTOR=0.' \
         '' >&2
 {%- endif %}
 }
 
 {%- when InitHook::Pwd -%}
 \command printf "%s\n%s\n" \
-    "zoxide: PWD hooks are not supported on POSIX shells." \
-    "        Use 'zoxide init posix --hook prompt' instead."
+    "querypath: PWD hooks are not supported on POSIX shells." \
+    "        Use 'querypath init posix --hook prompt' instead."
 
 {%- endmatch %}
 
 {{ section }}
-# When using zoxide with --no-cmd, alias these internal functions as desired.
+# When using querypath with --no-cmd, alias these internal functions as desired.
 #
 
 # Jump to a directory using only keywords.
-__zoxide_z() {
-    __zoxide_doctor
+__querypath_z() {
+    __querypath_doctor
 
     if [ "$#" -eq 0 ]; then
-        __zoxide_cd ~
+        __querypath_cd ~
     elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
         if [ -n "${OLDPWD}" ]; then
-            __zoxide_cd "${OLDPWD}"
+            __querypath_cd "${OLDPWD}"
         else
             # shellcheck disable=SC2016
-            \command printf 'zoxide: $OLDPWD is not set'
+            \command printf 'querypath: $OLDPWD is not set'
             return 1
         fi
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
-        __zoxide_cd "$1"
+        __querypath_cd "$1"
     else
-        __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" -- "$@")" &&
-            __zoxide_cd "${__zoxide_result}"
+        __querypath_result="$(\command querypath query --exclude "$(__querypath_pwd || \builtin true)" -- "$@")" &&
+            __querypath_cd "${__querypath_result}"
     fi
 }
 
 # Jump to a directory using interactive search.
-__zoxide_zi() {
-    __zoxide_doctor
-    __zoxide_result="$(\command zoxide query --interactive -- "$@")" && __zoxide_cd "${__zoxide_result}"
+__querypath_zi() {
+    __querypath_doctor
+    __querypath_result="$(\command querypath query --interactive -- "$@")" && __querypath_cd "${__querypath_result}"
 }
 
 {{ section }}
-# Commands for zoxide. Disable these using --no-cmd.
+# Commands for querypath. Disable these using --no-cmd.
 #
 
 {%- match cmd %}
@@ -115,12 +115,12 @@ __zoxide_zi() {
 
 \command unalias {{cmd}} >/dev/null 2>&1 || \true
 {{cmd}}() {
-    __zoxide_z "$@"
+    __querypath_z "$@"
 }
 
 \command unalias {{cmd}}i >/dev/null 2>&1 || \true
 {{cmd}}i() {
-    __zoxide_zi "$@"
+    __querypath_zi "$@"
 }
 
 {%- when None %}
@@ -130,6 +130,6 @@ __zoxide_zi() {
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide, add this to your configuration:
+# To initialize querypath, add this to your configuration:
 #
-# eval "$(zoxide init posix --hook prompt)"
+# eval "$(querypath init posix --hook prompt)"

@@ -1,5 +1,5 @@
-if command -sq zoxide
-    zoxide init fish | source
+if command -sq querypath
+    querypath init fish | source
 else
-    echo 'zoxide: command not found, please install it from https://github.com/ajeetdsouza/zoxide'
+    echo 'querypath: command not found, please install it from https://github.com/dimarogiv/querypath'
 end

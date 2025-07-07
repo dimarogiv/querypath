@@ -292,7 +292,7 @@ mod tests {
         source.push('\n');
 
         Command::new("pylint")
-            .args(["--from-stdin", "--persistent=n", "zoxide"])
+            .args(["--from-stdin", "--persistent=n", "querypath"])
             .write_stdin(source)
             .assert()
             .success()

@@ -14,37 +14,37 @@ import xonsh.dirstack  # type: ignore # pylint: disable=import-error
 import xonsh.environ  # type: ignore # pylint: disable=import-error
 
 {{ section }}
-# Utility functions for zoxide.
+# Utility functions for querypath.
 #
 
 
-def __zoxide_bin() -> str:
-    """Finds and returns the location of the zoxide binary."""
-    zoxide = typing.cast(str, xonsh.environ.locate_binary("zoxide"))
-    if zoxide is None:
-        zoxide = "zoxide"
-    return zoxide
+def __querypath_bin() -> str:
+    """Finds and returns the location of the querypath binary."""
+    querypath = typing.cast(str, xonsh.environ.locate_binary("querypath"))
+    if querypath is None:
+        querypath = "querypath"
+    return querypath
 
 
-def __zoxide_env() -> dict[str, str]:
+def __querypath_env() -> dict[str, str]:
     """Returns the current environment."""
     return builtins.__xonsh__.env.detype()  # type: ignore  # pylint:disable=no-member
 
 
-def __zoxide_pwd() -> str:
-    """pwd based on the value of _ZO_RESOLVE_SYMLINKS."""
+def __querypath_pwd() -> str:
+    """pwd based on the value of _QP_RESOLVE_SYMLINKS."""
 {%- if resolve_symlinks %}
     pwd = os.getcwd()
 {%- else %}
-    pwd = __zoxide_env().get("PWD")
+    pwd = __querypath_env().get("PWD")
     if pwd is None:
         raise RuntimeError("$PWD not found")
 {%- endif %}
     return pwd
 
 
-def __zoxide_cd(path: str | bytes | None = None) -> None:
-    """cd + custom logic based on the value of _ZO_ECHO."""
+def __querypath_cd(path: str | bytes | None = None) -> None:
+    """cd + custom logic based on the value of _QP_ECHO."""
     if path is None:
         args = []
     elif isinstance(path, bytes):
@@ -55,15 +55,15 @@ def __zoxide_cd(path: str | bytes | None = None) -> None:
     if exc is not None:
         raise RuntimeError(exc)
 {%- if echo %}
-    print(__zoxide_pwd())
+    print(__querypath_pwd())
 {%- endif %}
 
 
-class ZoxideSilentException(Exception):
+class QuerypathSilentException(Exception):
     """Exit without complaining."""
 
 
-def __zoxide_errhandler(
+def __querypath_errhandler(
     func: typing.Callable[[list[str]], None],
 ) -> typing.Callable[[list[str]], int]:
     """Print exception and exit with error code 1."""
@@ -72,17 +72,17 @@ def __zoxide_errhandler(
         try:
             func(args)
             return 0
-        except ZoxideSilentException:
+        except QuerypathSilentException:
             return 1
         except Exception as exc:  # pylint: disable=broad-except
-            print(f"zoxide: {exc}", file=sys.stderr)
+            print(f"querypath: {exc}", file=sys.stderr)
             return 1
 
     return wrapper
 
 
 {{ section }}
-# Hook configuration for zoxide.
+# Hook configuration for querypath.
 #
 
 {% if hook == InitHook::None -%}
@@ -90,80 +90,80 @@ def __zoxide_errhandler(
 
 {%- else -%}
 # Initialize hook to add new entries to the database.
-if "__zoxide_hook" not in globals():
+if "__querypath_hook" not in globals():
 {% if hook == InitHook::Prompt %}
     @builtins.events.on_post_prompt  # type: ignore  # pylint:disable=no-member
 {%- else if hook == InitHook::Pwd %}
     @builtins.events.on_chdir  # type: ignore  # pylint:disable=no-member
 {%- endif %}
-    def __zoxide_hook(**_kwargs: typing.Any) -> None:
+    def __querypath_hook(**_kwargs: typing.Any) -> None:
         """Hook to add new entries to the database."""
-        pwd = __zoxide_pwd()
-        zoxide = __zoxide_bin()
+        pwd = __querypath_pwd()
+        querypath = __querypath_bin()
         subprocess.run(
-            [zoxide, "add", "--", pwd],
+            [querypath, "add", "--", pwd],
             check=False,
-            env=__zoxide_env(),
+            env=__querypath_env(),
         )
 {% endif %}
 
 {{ section }}
-# When using zoxide with --no-cmd, alias these internal functions as desired.
+# When using querypath with --no-cmd, alias these internal functions as desired.
 #
 
 
-@__zoxide_errhandler
-def __zoxide_z(args: list[str]) -> None:
+@__querypath_errhandler
+def __querypath_z(args: list[str]) -> None:
     """Jump to a directory using only keywords."""
     if args == []:
-        __zoxide_cd()
+        __querypath_cd()
     elif args == ["-"]:
-        __zoxide_cd("-")
+        __querypath_cd("-")
     elif len(args) == 1 and os.path.isdir(args[0]):
-        __zoxide_cd(args[0])
+        __querypath_cd(args[0])
     else:
         try:
-            zoxide = __zoxide_bin()
+            querypath = __querypath_bin()
             cmd = subprocess.run(
-                [zoxide, "query", "--exclude", __zoxide_pwd(), "--"] + args,
+                [querypath, "query", "--exclude", __querypath_pwd(), "--"] + args,
                 check=True,
-                env=__zoxide_env(),
+                env=__querypath_env(),
                 stdout=subprocess.PIPE,
             )
         except subprocess.CalledProcessError as exc:
-            raise ZoxideSilentException() from exc
+            raise QuerypathSilentException() from exc
 
         result = cmd.stdout[:-1]
-        __zoxide_cd(result)
+        __querypath_cd(result)
 
 
-@__zoxide_errhandler
-def __zoxide_zi(args: list[str]) -> None:
+@__querypath_errhandler
+def __querypath_zi(args: list[str]) -> None:
     """Jump to a directory using interactive search."""
     try:
-        zoxide = __zoxide_bin()
+        querypath = __querypath_bin()
         cmd = subprocess.run(
-            [zoxide, "query", "-i", "--"] + args,
+            [querypath, "query", "-i", "--"] + args,
             check=True,
-            env=__zoxide_env(),
+            env=__querypath_env(),
             stdout=subprocess.PIPE,
         )
     except subprocess.CalledProcessError as exc:
-        raise ZoxideSilentException() from exc
+        raise QuerypathSilentException() from exc
 
     result = cmd.stdout[:-1]
-    __zoxide_cd(result)
+    __querypath_cd(result)
 
 
 {{ section }}
-# Commands for zoxide. Disable these using --no-cmd.
+# Commands for querypath. Disable these using --no-cmd.
 #
 
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-builtins.aliases["{{cmd}}"] = __zoxide_z  # type: ignore  # pylint:disable=no-member
-builtins.aliases["{{cmd}}i"] = __zoxide_zi  # type: ignore  # pylint:disable=no-member
+builtins.aliases["{{cmd}}"] = __querypath_z  # type: ignore  # pylint:disable=no-member
+builtins.aliases["{{cmd}}i"] = __querypath_zi  # type: ignore  # pylint:disable=no-member
 
 {%- when None %}
 
@@ -172,6 +172,6 @@ builtins.aliases["{{cmd}}i"] = __zoxide_zi  # type: ignore  # pylint:disable=no-
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide, add this to your configuration (usually ~/.xonshrc):
+# To initialize querypath, add this to your configuration (usually ~/.xonshrc):
 #
-# execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
+# execx($(querypath init xonsh), 'exec', __xonsh__.ctx, filename='querypath')

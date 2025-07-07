@@ -5,7 +5,7 @@ use assert_cmd::Command;
 
 #[test]
 fn completions_bash() {
-    let source = include_str!("../contrib/completions/zoxide.bash");
+    let source = include_str!("../contrib/completions/querypath.bash");
     Command::new("bash")
         .args(["--noprofile", "--norc", "-c", source])
         .assert()
@@ -20,7 +20,7 @@ fn completions_bash() {
 
 #[test]
 fn completions_fish() {
-    let source = include_str!("../contrib/completions/zoxide.fish");
+    let source = include_str!("../contrib/completions/querypath.fish");
     let tempdir = tempfile::tempdir().unwrap();
     let tempdir = tempdir.path().to_str().unwrap();
 
@@ -35,7 +35,7 @@ fn completions_fish() {
 
 #[test]
 fn completions_powershell() {
-    let source = include_str!("../contrib/completions/_zoxide.ps1");
+    let source = include_str!("../contrib/completions/_querypath.ps1");
     Command::new("pwsh")
         .args(["-NoLogo", "-NonInteractive", "-NoProfile", "-Command", source])
         .assert()

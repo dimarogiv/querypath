@@ -12,13 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support for Tcsh.
-- Added `--score` flag to `zoxide add`.
+- Added `--score` flag to `querypath add`.
 - POSIX: add doctor to diagnose common issues.
 - Nushell: add CLI completions.
 
 ### Changed
 
-- Bash: zoxide will now automatically `cd` when selecting Space-Tab completions.
+- Bash: querypath will now automatically `cd` when selecting Space-Tab completions.
 
 ### Fixed
 
@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bash: completions now work with `ble.sh`.
 - Nushell: stop ignoring symlinks when `cd`-ing into a directory.
 - Fzf: updated minimum supported version to v0.51.0.
-- PowerShell: avoid setting `$error` when defining `__zoxide_hooked`.
+- PowerShell: avoid setting `$error` when defining `__querypath_hooked`.
 - PowerShell: handle special characters in file paths when `cd`-ing into them.
 - Database corruption issue when the filesystem is 100% full.
 
@@ -47,7 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fish: `builtin abbr` doesn't work on older versions.
-- Zsh: make `__zoxide_z_complete` available with `--no-cmd`.
+- Zsh: make `__querypath_z_complete` available with `--no-cmd`.
 
 ## [0.9.5] - 2024-09-13
 
@@ -66,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - fzf: removed `--select-1` from default options. The interactive selector will
   now open up even if there is only one match.
-- Enforce that `$_ZO_DATA_DIR` is an absolute path.
+- Enforce that `$_QP_DATA_DIR` is an absolute path.
 
 ### Fixed
 
@@ -78,7 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fish: `cd` command is now copied directly from
   `$__fish_data_dir/functions/cd.fish`. This should minimize the chances of an
   infinite loop when aliasing `cd=z`.
-- Symlinks not getting added to the database when `$_ZO_RESOLVE_SYMLINKS=0`.
+- Symlinks not getting added to the database when `$_QP_RESOLVE_SYMLINKS=0`.
 - Symlinked database files getting replaced instead of the actual files.
 
 ## [0.9.4] - 2024-02-21
@@ -97,7 +97,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Short option `-a` for `zoxide query --all`.
+- Short option `-a` for `querypath query --all`.
 
 ### Fixed
 
@@ -107,7 +107,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Fish/Zsh: aliases on `__zoxide_z` will now use completions.
+- Fish/Zsh: aliases on `__querypath_z` will now use completions.
 - Nushell: support for v0.78.0.
 - Fish: plugin now works on older versions.
 - PowerShell: warn when PowerShell version is too old for `z -` and `z +`.
@@ -187,7 +187,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bash: only enable completions on 4.4+.
 - Fzf: bypass `ls` alias in preview window.
 - Retain ownership of database file.
-- `zoxide query --interactive` should not conflict with `--score`.
+- `querypath query --interactive` should not conflict with `--score`.
 
 ## [0.8.0] - 2021-12-25
 
@@ -278,7 +278,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `zoxide add` and `zoxide remove` now accept multiple arguments.
+- `querypath add` and `querypath remove` now accept multiple arguments.
 
 ### Fixed
 
@@ -292,24 +292,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `zoxide -V` not printing version.
+- `querypath -V` not printing version.
 
 ## [0.7.1] - 2021-06-09
 
 ### Added
 
 - Auto-generated shell completions.
-- `zoxide query --all` for listing deleted directories.
+- `querypath query --all` for listing deleted directories.
 - Lazy deletion for removed directories that have not been accessed in > 90
   days.
 - Nushell: support for 0.32.0+.
 
 ### Fixed
 
-- Nushell: avoid calling `__zoxide_hook` on non-filesystem subshells.
-- Fish: `alias cd=z` now works, but it must be done after calling `zoxide init`.
-- PowerShell: avoid calling `__zoxide_hook` on non-filesystem providers.
-- Fish: avoid calling `__zoxide_hook` in private mode.
+- Nushell: avoid calling `__querypath_hook` on non-filesystem subshells.
+- Fish: `alias cd=z` now works, but it must be done after calling `querypath init`.
+- PowerShell: avoid calling `__querypath_hook` on non-filesystem providers.
+- Fish: avoid calling `__querypath_hook` in private mode.
 
 ## [0.7.0] - 2021-05-02
 
@@ -320,15 +320,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `zoxide remove -i` now accepts multiple selections.
-- `zoxide add` no longer accepts zero parameters.
-- `$_ZO_EXCLUDE_DIRS` now defaults to `"$HOME"`.
+- `querypath remove -i` now accepts multiple selections.
+- `querypath add` no longer accepts zero parameters.
+- `$_QP_EXCLUDE_DIRS` now defaults to `"$HOME"`.
 - Binary releases now use `.zip` on Windows, `.tar.gz` otherwise.
 
 ### Fixed
 
 - `cd -` on Fish shells.
-- `__zoxide_hook` no longer changes value of `$?` within `$PROMPT_COMMAND` on
+- `__querypath_hook` no longer changes value of `$?` within `$PROMPT_COMMAND` on
   Bash.
 
 ### Removed
@@ -354,7 +354,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Handle broken pipe errors gracefully when writing to streams.
 - NUL file appearing in working directory on Windows.
 - Accidental redefinition of hooks when initialized twice on some shells.
-- zoxide unable to find itself on Xonsh shells.
+- querypath unable to find itself on Xonsh shells.
 
 ### Removed
 
@@ -365,15 +365,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `$_ZO_EXCLUDE_DIRS` now supports globs.
-- `zoxide init` now defines `__zoxide_z*` functions that can be aliased as
+- `$_QP_EXCLUDE_DIRS` now supports globs.
+- `querypath init` now defines `__querypath_z*` functions that can be aliased as
   needed.
 - Support for the [Xonsh](https://xon.sh/) shell.
-- `zoxide import` can now import from Autojump.
+- `querypath import` can now import from Autojump.
 
 ### Changed
 
-- `zoxide init --no-aliases` no longer generates `z` or `zi`.
+- `querypath init --no-aliases` no longer generates `z` or `zi`.
 
 ### Fixed
 
@@ -394,20 +394,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `$_ZO_FZF_OPTS` to specify custom options for `fzf`
-- `zoxide query --list` to list all matches
-- `zoxide query --score` to show score along with result
+- `$_QP_FZF_OPTS` to specify custom options for `fzf`
+- `querypath query --list` to list all matches
+- `querypath query --score` to show score along with result
 
 ### Changed
 
-- Increased default value of `$_ZO_MAXAGE` to `10000`.
+- Increased default value of `$_QP_MAXAGE` to `10000`.
 - Symlinks are treated as separate directories by default, this can be changed
-  by setting `_ZO_RESOLVE_SYMLINKS=1`.
+  by setting `_QP_RESOLVE_SYMLINKS=1`.
 
 ### Removed
 
 - Help menus for `z` and `zri`.
-- `zoxide remove -i` is replaced with `zri`.
+- `querypath remove -i` is replaced with `zri`.
 
 ## [0.4.1] - 2020-05-25
 
@@ -424,17 +424,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Interactive mode for removing entries (`zoxide remove -i`).
+- Interactive mode for removing entries (`querypath remove -i`).
 - Aliases for interactive `query` and `remove` (`zqi` and `zri` respectively).
 - PWD hooks for POSIX shells.
 
 ### Changed
 
-- `zoxide remove` now throws an error if there was no match in the database.
-- Interactive mode in `zoxide` no longer errors out if `fzf` exits gracefully.
+- `querypath remove` now throws an error if there was no match in the database.
+- Interactive mode in `querypath` no longer errors out if `fzf` exits gracefully.
 - Canonicalize to regular paths instead of UNC paths on Windows.
-- `zoxide init` now uses PWD hooks by default for better performance.
-- `$_ZO_ECHO` now only works when set to `1`.
+- `querypath init` now uses PWD hooks by default for better performance.
+- `$_QP_ECHO` now only works when set to `1`.
 - Using the `--z-cmd` flag now also renames the associated aliases.
 - The `--z-cmd` flag has been renamed to `--cmd`.
 - The `--no-define-aliases` flag has been renamed to `--no-aliases`.
@@ -448,11 +448,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Version output displays `git` revision information.
-- `--z-cmd` flag for `zoxide init` to rename the `z` command to something else.
+- `--z-cmd` flag for `querypath init` to rename the `z` command to something else.
 
 ### Changed
 
-- `zoxide query` output no longer has the `query:` prefix.
+- `querypath query` output no longer has the `query:` prefix.
 
 ### Fixed
 
@@ -463,7 +463,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Automatic migration from `v0.2.x` databases.
-- `$_ZO_EXCLUDE_DIRS` to prevent directories from being added to the database.
+- `$_QP_EXCLUDE_DIRS` to prevent directories from being added to the database.
 - Support for POSIX-compliant shells.
 
 ### Changed
@@ -474,7 +474,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Thread safety using unique tempfile names for each `zoxide` instance.
+- Thread safety using unique tempfile names for each `querypath` instance.
 - Incomprehensive "could not allocate" message on database corruption.
 
 ## [0.2.2] - 2020-03-20
@@ -491,7 +491,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `$_ZO_ECHO` to echo match before `cd`ing.
+- `$_QP_ECHO` to echo match before `cd`ing.
 - Minimal `ranger` plugin.
 - PWD hook to only update the database when the current directory is changed.
 - Support for Bash.
@@ -512,7 +512,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `_zoxide_precmd` overriding other precmd hooks on Zsh.
+- `_querypath_precmd` overriding other precmd hooks on Zsh.
 
 ## [0.1.1] - 2020-03-08
 
@@ -527,7 +527,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Multiple hooks being added upon initializing `zoxide` multiple times.
+- Multiple hooks being added upon initializing `querypath` multiple times.
 
 ## [0.1.0] - 2020-03-05
 
@@ -536,39 +536,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions pipeline to build and upload releases.
 - Add support for Zsh.
 
-[0.9.8]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.7...v0.9.8
-[0.9.7]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.6...v0.9.7
-[0.9.6]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.5...v0.9.6
-[0.9.5]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.4...v0.9.5
-[0.9.4]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.3...v0.9.4
-[0.9.3]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.2...v0.9.3
-[0.9.2]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.1...v0.9.2
-[0.9.1]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.0...v0.9.1
-[0.9.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.8.3...v0.9.0
-[0.8.3]: https://github.com/ajeetdsouza/zoxide/compare/v0.8.2...v0.8.3
-[0.8.2]: https://github.com/ajeetdsouza/zoxide/compare/v0.8.1...v0.8.2
-[0.8.1]: https://github.com/ajeetdsouza/zoxide/compare/v0.8.0...v0.8.1
-[0.8.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.9...v0.8.0
-[0.7.9]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.8...v0.7.9
-[0.7.8]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.7...v0.7.8
-[0.7.7]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.6...v0.7.7
-[0.7.6]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.5...v0.7.6
-[0.7.5]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.4...v0.7.5
-[0.7.4]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.3...v0.7.4
-[0.7.3]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.2...v0.7.3
-[0.7.2]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.1...v0.7.2
-[0.7.1]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.0...v0.7.1
-[0.7.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.6.0...v0.7.0
-[0.6.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.5.0...v0.6.0
-[0.5.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.4.3...v0.5.0
-[0.4.3]: https://github.com/ajeetdsouza/zoxide/compare/v0.4.2...v0.4.3
-[0.4.2]: https://github.com/ajeetdsouza/zoxide/compare/v0.4.1...v0.4.2
-[0.4.1]: https://github.com/ajeetdsouza/zoxide/compare/v0.4.0...v0.4.1
-[0.4.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.3.1...v0.4.0
-[0.3.1]: https://github.com/ajeetdsouza/zoxide/compare/v0.3.0...v0.3.1
-[0.3.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.2.2...v0.3.0
-[0.2.2]: https://github.com/ajeetdsouza/zoxide/compare/v0.2.1...v0.2.2
-[0.2.1]: https://github.com/ajeetdsouza/zoxide/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.1.1...v0.2.0
-[0.1.1]: https://github.com/ajeetdsouza/zoxide/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/ajeetdsouza/zoxide/commits/v0.1.0
+[0.9.8]: https://github.com/ajeetdsouza/querypath/compare/v0.9.7...v0.9.8
+[0.9.7]: https://github.com/ajeetdsouza/querypath/compare/v0.9.6...v0.9.7
+[0.9.6]: https://github.com/ajeetdsouza/querypath/compare/v0.9.5...v0.9.6
+[0.9.5]: https://github.com/ajeetdsouza/querypath/compare/v0.9.4...v0.9.5
+[0.9.4]: https://github.com/ajeetdsouza/querypath/compare/v0.9.3...v0.9.4
+[0.9.3]: https://github.com/ajeetdsouza/querypath/compare/v0.9.2...v0.9.3
+[0.9.2]: https://github.com/ajeetdsouza/querypath/compare/v0.9.1...v0.9.2
+[0.9.1]: https://github.com/ajeetdsouza/querypath/compare/v0.9.0...v0.9.1
+[0.9.0]: https://github.com/ajeetdsouza/querypath/compare/v0.8.3...v0.9.0
+[0.8.3]: https://github.com/ajeetdsouza/querypath/compare/v0.8.2...v0.8.3
+[0.8.2]: https://github.com/ajeetdsouza/querypath/compare/v0.8.1...v0.8.2
+[0.8.1]: https://github.com/ajeetdsouza/querypath/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/ajeetdsouza/querypath/compare/v0.7.9...v0.8.0
+[0.7.9]: https://github.com/ajeetdsouza/querypath/compare/v0.7.8...v0.7.9
+[0.7.8]: https://github.com/ajeetdsouza/querypath/compare/v0.7.7...v0.7.8
+[0.7.7]: https://github.com/ajeetdsouza/querypath/compare/v0.7.6...v0.7.7
+[0.7.6]: https://github.com/ajeetdsouza/querypath/compare/v0.7.5...v0.7.6
+[0.7.5]: https://github.com/ajeetdsouza/querypath/compare/v0.7.4...v0.7.5
+[0.7.4]: https://github.com/ajeetdsouza/querypath/compare/v0.7.3...v0.7.4
+[0.7.3]: https://github.com/ajeetdsouza/querypath/compare/v0.7.2...v0.7.3
+[0.7.2]: https://github.com/ajeetdsouza/querypath/compare/v0.7.1...v0.7.2
+[0.7.1]: https://github.com/ajeetdsouza/querypath/compare/v0.7.0...v0.7.1
+[0.7.0]: https://github.com/ajeetdsouza/querypath/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/ajeetdsouza/querypath/compare/v0.5.0...v0.6.0
+[0.5.0]: https://github.com/ajeetdsouza/querypath/compare/v0.4.3...v0.5.0
+[0.4.3]: https://github.com/ajeetdsouza/querypath/compare/v0.4.2...v0.4.3
+[0.4.2]: https://github.com/ajeetdsouza/querypath/compare/v0.4.1...v0.4.2
+[0.4.1]: https://github.com/ajeetdsouza/querypath/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/ajeetdsouza/querypath/compare/v0.3.1...v0.4.0
+[0.3.1]: https://github.com/ajeetdsouza/querypath/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/ajeetdsouza/querypath/compare/v0.2.2...v0.3.0
+[0.2.2]: https://github.com/ajeetdsouza/querypath/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/ajeetdsouza/querypath/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/ajeetdsouza/querypath/compare/v0.1.1...v0.2.0
+[0.1.1]: https://github.com/ajeetdsouza/querypath/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/ajeetdsouza/querypath/commits/v0.1.0

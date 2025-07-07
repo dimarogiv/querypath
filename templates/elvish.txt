@@ -5,11 +5,11 @@ use builtin
 use path
 
 {{ section }}
-# Utility functions for zoxide.
+# Utility functions for querypath.
 #
 
-# cd + custom logic based on the value of _ZO_ECHO.
-fn __zoxide_cd {|path|
+# cd + custom logic based on the value of _QP_ECHO.
+fn __querypath_cd {|path|
     builtin:cd $path
 {%- if echo %}
     builtin:echo $pwd
@@ -17,81 +17,81 @@ fn __zoxide_cd {|path|
 }
 
 {{ section }}
-# Hook configuration for zoxide.
+# Hook configuration for querypath.
 #
 
 # Initialize hook to track previous directory.
 var oldpwd = $builtin:pwd
 set builtin:before-chdir = [$@builtin:before-chdir {|_| set oldpwd = $builtin:pwd }]
 
-# Initialize hook to add directories to zoxide.
+# Initialize hook to add directories to querypath.
 {%- if hook == InitHook::None %}
 {{ not_configured }}
 
 {%- else %}
-if (builtin:not (builtin:eq $E:__zoxide_shlvl $E:SHLVL)) {
-    set E:__zoxide_shlvl = $E:SHLVL
+if (builtin:not (builtin:eq $E:__querypath_shlvl $E:SHLVL)) {
+    set E:__querypath_shlvl = $E:SHLVL
 {%- if hook == InitHook::Prompt %}
-    set edit:before-readline = [$@edit:before-readline {|| zoxide add -- $pwd }]
+    set edit:before-readline = [$@edit:before-readline {|| querypath add -- $pwd }]
 {%- else if hook == InitHook::Pwd %}
-    set builtin:after-chdir = [$@builtin:after-chdir {|_| zoxide add -- $pwd }]
+    set builtin:after-chdir = [$@builtin:after-chdir {|_| querypath add -- $pwd }]
 {%- endif %}
 }
 
 {%- endif %}
 
 {{ section }}
-# When using zoxide with --no-cmd, alias these internal functions as desired.
+# When using querypath with --no-cmd, alias these internal functions as desired.
 #
 
 # Jump to a directory using only keywords.
-fn __zoxide_z {|@rest|
+fn __querypath_z {|@rest|
     if (builtin:eq [] $rest) {
-        __zoxide_cd ~
+        __querypath_cd ~
     } elif (builtin:eq [-] $rest) {
-        __zoxide_cd $oldpwd
+        __querypath_cd $oldpwd
     } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-dir &follow-symlink=$true $rest[0])) {
-        __zoxide_cd $rest[0]
+        __querypath_cd $rest[0]
     } else {
         var path
         try {
-            set path = (zoxide query --exclude $pwd -- $@rest)
+            set path = (querypath query --exclude $pwd -- $@rest)
         } catch {
         } else {
-            __zoxide_cd $path
+            __querypath_cd $path
         }
     }
 }
-edit:add-var __zoxide_z~ $__zoxide_z~
+edit:add-var __querypath_z~ $__querypath_z~
 
 # Jump to a directory using interactive search.
-fn __zoxide_zi {|@rest|
+fn __querypath_zi {|@rest|
     var path
     try {
-        set path = (zoxide query --interactive -- $@rest)
+        set path = (querypath query --interactive -- $@rest)
     } catch {
     } else {
-        __zoxide_cd $path
+        __querypath_cd $path
     }
 }
-edit:add-var __zoxide_zi~ $__zoxide_zi~
+edit:add-var __querypath_zi~ $__querypath_zi~
 
 {{ section }}
-# Commands for zoxide. Disable these using --no-cmd.
+# Commands for querypath. Disable these using --no-cmd.
 #
 
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-edit:add-var {{cmd}}~ $__zoxide_z~
-edit:add-var {{cmd}}i~ $__zoxide_zi~
+edit:add-var {{cmd}}~ $__querypath_z~
+edit:add-var {{cmd}}i~ $__querypath_zi~
 
 # Load completions.
 {#-
-  zoxide-based completions are currently not possible, because Elvish only prints
+  querypath-based completions are currently not possible, because Elvish only prints
   a completion if the current token is a prefix of it.
 #}
-fn __zoxide_z_complete {|@rest|
+fn __querypath_z_complete {|@rest|
     if (!= (builtin:count $rest) 2) {
         builtin:return
     }
@@ -103,7 +103,7 @@ fn __zoxide_z_complete {|@rest|
             }
         }
 }
-set edit:completion:arg-completer[{{cmd}}] = $__zoxide_z_complete~
+set edit:completion:arg-completer[{{cmd}}] = $__querypath_z_complete~
 
 {%- when None %}
 
@@ -112,9 +112,9 @@ set edit:completion:arg-completer[{{cmd}}] = $__zoxide_z_complete~
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide, add this to your configuration (usually
+# To initialize querypath, add this to your configuration (usually
 # ~/.elvish/rc.elv):
 #
-#   eval (zoxide init elvish | slurp)
+#   eval (querypath init elvish | slurp)
 #
-# Note: zoxide only supports elvish v0.18.0 and above.
+# Note: querypath only supports elvish v0.18.0 and above.

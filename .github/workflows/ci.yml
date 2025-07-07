@@ -44,7 +44,7 @@ jobs:
         if: ${{ matrix.os != 'windows-latest' && env.CACHIX_AUTH_TOKEN != '' }}
         with:
           authToken: ${{ env.CACHIX_AUTH_TOKEN }}
-          name: zoxide
+          name: querypath
       - name: Setup cache
         uses: Swatinem/rust-cache@v2.7.8
         with:

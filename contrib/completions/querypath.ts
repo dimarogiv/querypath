@@ -1,5 +1,5 @@
 const completion: Fig.Spec = {
-  name: "zoxide",
+  name: "querypath",
   description: "A smarter cd command for your terminal",
   subcommands: [
     {
@@ -160,7 +160,7 @@ const completion: Fig.Spec = {
         },
         {
           name: "--hook",
-          description: "Changes how often zoxide increments a directory's score",
+          description: "Changes how often querypath increments a directory's score",
           isRepeatable: true,
           args: {
             name: "hook",
@@ -174,7 +174,7 @@ const completion: Fig.Spec = {
         },
         {
           name: "--no-cmd",
-          description: "Prevents zoxide from defining the `z` and `zi` commands",
+          description: "Prevents querypath from defining the `z` and `zi` commands",
         },
         {
           name: ["-h", "--help"],

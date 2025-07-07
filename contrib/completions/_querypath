@@ -1,8 +1,8 @@
-#compdef zoxide
+#compdef querypath
 
 autoload -U is-at-least
 
-_zoxide() {
+_querypath() {
     typeset -A opt_args
     typeset -a _arguments_options
     local ret=1
@@ -19,14 +19,14 @@ _zoxide() {
 '--help[Print help]' \
 '-V[Print version]' \
 '--version[Print version]' \
-":: :_zoxide_commands" \
-"*::: :->zoxide" \
+":: :_querypath_commands" \
+"*::: :->querypath" \
 && ret=0
     case $state in
-    (zoxide)
+    (querypath)
         words=($line[1] "${words[@]}")
         (( CURRENT += 1 ))
-        curcontext="${curcontext%:*:*}:zoxide-command-$line[1]:"
+        curcontext="${curcontext%:*:*}:querypath-command-$line[1]:"
         case $line[1] in
             (add)
 _arguments "${_arguments_options[@]}" : \
@@ -45,7 +45,7 @@ _arguments "${_arguments_options[@]}" : \
 '--help[Print help]' \
 '-V[Print version]' \
 '--version[Print version]' \
-":: :_zoxide__edit_commands" \
+":: :_querypath__edit_commands" \
 "*::: :->edit" \
 && ret=0
 
@@ -53,7 +53,7 @@ _arguments "${_arguments_options[@]}" : \
     (edit)
         words=($line[1] "${words[@]}")
         (( CURRENT += 1 ))
-        curcontext="${curcontext%:*:*}:zoxide-edit-command-$line[1]:"
+        curcontext="${curcontext%:*:*}:querypath-edit-command-$line[1]:"
         case $line[1] in
             (decrement)
 _arguments "${_arguments_options[@]}" : \
@@ -108,8 +108,8 @@ _arguments "${_arguments_options[@]}" : \
 (init)
 _arguments "${_arguments_options[@]}" : \
 '--cmd=[Changes the prefix of the \`z\` and \`zi\` commands]:CMD:_default' \
-'--hook=[Changes how often zoxide increments a directory'\''s score]:HOOK:(none prompt pwd)' \
-'--no-cmd[Prevents zoxide from defining the \`z\` and \`zi\` commands]' \
+'--hook=[Changes how often querypath increments a directory'\''s score]:HOOK:(none prompt pwd)' \
+'--no-cmd[Prevents querypath from defining the \`z\` and \`zi\` commands]' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
@@ -149,8 +149,8 @@ _arguments "${_arguments_options[@]}" : \
 esac
 }
 
-(( $+functions[_zoxide_commands] )) ||
-_zoxide_commands() {
+(( $+functions[_querypath_commands] )) ||
+_querypath_commands() {
     local commands; commands=(
 'add:Add a new directory or increment its rank' \
 'edit:Edit the database' \
@@ -159,66 +159,66 @@ _zoxide_commands() {
 'query:Search for a directory in the database' \
 'remove:Remove a directory from the database' \
     )
-    _describe -t commands 'zoxide commands' commands "$@"
+    _describe -t commands 'querypath commands' commands "$@"
 }
-(( $+functions[_zoxide__add_commands] )) ||
-_zoxide__add_commands() {
+(( $+functions[_querypath__add_commands] )) ||
+_querypath__add_commands() {
     local commands; commands=()
-    _describe -t commands 'zoxide add commands' commands "$@"
+    _describe -t commands 'querypath add commands' commands "$@"
 }
-(( $+functions[_zoxide__edit_commands] )) ||
-_zoxide__edit_commands() {
+(( $+functions[_querypath__edit_commands] )) ||
+_querypath__edit_commands() {
     local commands; commands=(
 'decrement:' \
 'delete:' \
 'increment:' \
 'reload:' \
     )
-    _describe -t commands 'zoxide edit commands' commands "$@"
+    _describe -t commands 'querypath edit commands' commands "$@"
 }
-(( $+functions[_zoxide__edit__decrement_commands] )) ||
-_zoxide__edit__decrement_commands() {
+(( $+functions[_querypath__edit__decrement_commands] )) ||
+_querypath__edit__decrement_commands() {
     local commands; commands=()
-    _describe -t commands 'zoxide edit decrement commands' commands "$@"
+    _describe -t commands 'querypath edit decrement commands' commands "$@"
 }
-(( $+functions[_zoxide__edit__delete_commands] )) ||
-_zoxide__edit__delete_commands() {
+(( $+functions[_querypath__edit__delete_commands] )) ||
+_querypath__edit__delete_commands() {
     local commands; commands=()
-    _describe -t commands 'zoxide edit delete commands' commands "$@"
+    _describe -t commands 'querypath edit delete commands' commands "$@"
 }
-(( $+functions[_zoxide__edit__increment_commands] )) ||
-_zoxide__edit__increment_commands() {
+(( $+functions[_querypath__edit__increment_commands] )) ||
+_querypath__edit__increment_commands() {
     local commands; commands=()
-    _describe -t commands 'zoxide edit increment commands' commands "$@"
+    _describe -t commands 'querypath edit increment commands' commands "$@"
 }
-(( $+functions[_zoxide__edit__reload_commands] )) ||
-_zoxide__edit__reload_commands() {
+(( $+functions[_querypath__edit__reload_commands] )) ||
+_querypath__edit__reload_commands() {
     local commands; commands=()
-    _describe -t commands 'zoxide edit reload commands' commands "$@"
+    _describe -t commands 'querypath edit reload commands' commands "$@"
 }
-(( $+functions[_zoxide__import_commands] )) ||
-_zoxide__import_commands() {
+(( $+functions[_querypath__import_commands] )) ||
+_querypath__import_commands() {
     local commands; commands=()
-    _describe -t commands 'zoxide import commands' commands "$@"
+    _describe -t commands 'querypath import commands' commands "$@"
 }
-(( $+functions[_zoxide__init_commands] )) ||
-_zoxide__init_commands() {
+(( $+functions[_querypath__init_commands] )) ||
+_querypath__init_commands() {
     local commands; commands=()
-    _describe -t commands 'zoxide init commands' commands "$@"
+    _describe -t commands 'querypath init commands' commands "$@"
 }
-(( $+functions[_zoxide__query_commands] )) ||
-_zoxide__query_commands() {
+(( $+functions[_querypath__query_commands] )) ||
+_querypath__query_commands() {
     local commands; commands=()
-    _describe -t commands 'zoxide query commands' commands "$@"
+    _describe -t commands 'querypath query commands' commands "$@"
 }
-(( $+functions[_zoxide__remove_commands] )) ||
-_zoxide__remove_commands() {
+(( $+functions[_querypath__remove_commands] )) ||
+_querypath__remove_commands() {
     local commands; commands=()
-    _describe -t commands 'zoxide remove commands' commands "$@"
+    _describe -t commands 'querypath remove commands' commands "$@"
 }
 
-if [ "$funcstack[1]" = "_zoxide" ]; then
-    _zoxide "$@"
+if [ "$funcstack[1]" = "_querypath" ]; then
+    _querypath "$@"
 else
-    compdef _zoxide zoxide
+    compdef _querypath querypath
 fi

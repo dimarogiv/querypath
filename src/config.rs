@@ -8,28 +8,28 @@ use glob::Pattern;
 use crate::db::Rank;
 
 pub fn data_dir() -> Result<PathBuf> {
-    let dir = match env::var_os("_ZO_DATA_DIR") {
+    let dir = match env::var_os("_QP_DATA_DIR") {
         Some(path) => PathBuf::from(path),
         None => dirs::data_local_dir()
-            .context("could not find data directory, please set _ZO_DATA_DIR manually")?
-            .join("zoxide"),
+            .context("could not find data directory, please set _QP_DATA_DIR manually")?
+            .join("querypath"),
     };
 
-    ensure!(dir.is_absolute(), "_ZO_DATA_DIR must be an absolute path");
+    ensure!(dir.is_absolute(), "_QP_DATA_DIR must be an absolute path");
     Ok(dir)
 }
 
 pub fn echo() -> bool {
-    env::var_os("_ZO_ECHO").is_some_and(|var| var == "1")
+    env::var_os("_QP_ECHO").is_some_and(|var| var == "1")
 }
 
 pub fn exclude_dirs() -> Result<Vec<Pattern>> {
-    match env::var_os("_ZO_EXCLUDE_DIRS") {
+    match env::var_os("_QP_EXCLUDE_DIRS") {
         Some(paths) => env::split_paths(&paths)
             .map(|path| {
-                let pattern = path.to_str().context("invalid unicode in _ZO_EXCLUDE_DIRS")?;
+                let pattern = path.to_str().context("invalid unicode in _QP_EXCLUDE_DIRS")?;
                 Pattern::new(pattern)
-                    .with_context(|| format!("invalid glob in _ZO_EXCLUDE_DIRS: {pattern}"))
+                    .with_context(|| format!("invalid glob in _QP_EXCLUDE_DIRS: {pattern}"))
             })
             .collect(),
         None => {
@@ -44,19 +44,19 @@ pub fn exclude_dirs() -> Result<Vec<Pattern>> {
 }
 
 pub fn fzf_opts() -> Option<OsString> {
-    env::var_os("_ZO_FZF_OPTS")
+    env::var_os("_QP_FZF_OPTS")
 }
 
 pub fn maxage() -> Result<Rank> {
-    env::var_os("_ZO_MAXAGE").map_or(Ok(10_000.0), |maxage| {
-        let maxage = maxage.to_str().context("invalid unicode in _ZO_MAXAGE")?;
+    env::var_os("_QP_MAXAGE").map_or(Ok(10_000.0), |maxage| {
+        let maxage = maxage.to_str().context("invalid unicode in _QP_MAXAGE")?;
         let maxage = maxage
             .parse::<u32>()
-            .with_context(|| format!("unable to parse _ZO_MAXAGE as integer: {maxage}"))?;
+            .with_context(|| format!("unable to parse _QP_MAXAGE as integer: {maxage}"))?;
         Ok(maxage as Rank)
     })
 }
 
 pub fn resolve_symlinks() -> bool {
-    env::var_os("_ZO_RESOLVE_SYMLINKS").is_some_and(|var| var == "1")
+    env::var_os("_QP_RESOLVE_SYMLINKS").is_some_and(|var| var == "1")
 }

@@ -2,7 +2,7 @@
 # shellcheck shell=dash
 # shellcheck disable=SC3043 # Assume `local` extension
 
-# The official zoxide installer.
+# The official querypath installer.
 #
 # It runs on Unix shells like {a,ba,da,k,z}sh. It uses the common `local`
 # extension. Note: Most shells limit `local` to 1 var per line, contra bash.
@@ -25,8 +25,8 @@ main() {
 
     local _bin_name
     case "${_arch}" in
-    *windows*) _bin_name="zoxide.exe" ;;
-    *) _bin_name="zoxide" ;;
+    *windows*) _bin_name="querypath.exe" ;;
+    *) _bin_name="querypath" ;;
     esac
 
     # Create and enter a temporary directory.
@@ -34,9 +34,9 @@ main() {
     _tmp_dir="$(mktemp -d)" || err "mktemp: could not create temporary directory"
     cd "${_tmp_dir}" || err "cd: failed to enter directory: ${_tmp_dir}"
 
-    # Download and extract zoxide.
+    # Download and extract querypath.
     local _package
-    _package="$(ensure download_zoxide "${_arch}")"
+    _package="$(ensure download_querypath "${_arch}")"
     assert_nz "${_package}" "package"
     echo "Downloaded package: ${_package}"
     case "${_package}" in
@@ -57,7 +57,7 @@ main() {
     ensure try_sudo mkdir -p -- "${BIN_DIR}"
     ensure try_sudo cp -- "${_bin_name}" "${BIN_DIR}/${_bin_name}"
     ensure try_sudo chmod +x "${BIN_DIR}/${_bin_name}"
-    echo "Installed zoxide to ${BIN_DIR}"
+    echo "Installed querypath to ${BIN_DIR}"
 
     # Install manpages.
     ensure try_sudo mkdir -p -- "${MAN_DIR}/man1"
@@ -66,9 +66,9 @@ main() {
 
     # Print success message and check $PATH.
     echo ""
-    echo "zoxide is installed!"
+    echo "querypath is installed!"
     if ! echo ":${PATH}:" | grep -Fq ":${BIN_DIR}:"; then
-        echo "Note: ${BIN_DIR} is not on your \$PATH. zoxide will not work unless it is added to \$PATH."
+        echo "Note: ${BIN_DIR} is not on your \$PATH. querypath will not work unless it is added to \$PATH."
     fi
 }
 
@@ -108,11 +108,11 @@ usage() {
     _arch="$(get_architecture || true)"
 
     echo "\
-${_text_heading}zoxide installer${_text_reset}
+${_text_heading}querypath installer${_text_reset}
 Ajeet D'Souza <98ajeet@gmail.com>
-https://github.com/ajeetdsouza/zoxide
+https://github.com/dimarogiv/querypath
 
-Fetches and installs zoxide. If zoxide is already installed, it will be updated to the latest version.
+Fetches and installs querypath. If querypath is already installed, it will be updated to the latest version.
 
 ${_text_heading}Usage:${_text_reset}
   install.sh [OPTIONS]
@@ -125,7 +125,7 @@ ${_text_heading}Options:${_text_reset}
   -h, --help     Print help"
 }
 
-download_zoxide() {
+download_querypath() {
     local _arch="$1"
 
     if check_cmd curl; then
@@ -137,7 +137,7 @@ download_zoxide() {
     fi
     need_cmd grep
 
-    local _releases_url="https://api.github.com/repos/ajeetdsouza/zoxide/releases/latest"
+    local _releases_url="https://api.github.com/repos/dimarogiv/querypath/releases/latest"
     local _releases
     case "${_dld}" in
     curl) _releases="$(curl -sL "${_releases_url}")" ||
@@ -147,11 +147,11 @@ download_zoxide() {
     *) err "unsupported downloader: ${_dld}" ;;
     esac
     (echo "${_releases}" | grep -q 'API rate limit exceeded') &&
-        err "you have exceeded GitHub's API rate limit. Please try again later, or use a different installation method: https://github.com/ajeetdsouza/zoxide/#installation"
+        err "you have exceeded GitHub's API rate limit. Please try again later, or use a different installation method: https://github.com/dimarogiv/querypath/#installation"
 
     local _package_url
     _package_url="$(echo "${_releases}" | grep "browser_download_url" | cut -d '"' -f 4 | grep -- "${_arch}")" ||
-        err "zoxide has not yet been packaged for your architecture (${_arch}), please file an issue: https://github.com/ajeetdsouza/zoxide/issues"
+        err "querypath has not yet been packaged for your architecture (${_arch}), please file an issue: https://github.com/dimarogiv/querypath/issues"
 
     local _ext
     case "${_package_url}" in
@@ -160,7 +160,7 @@ download_zoxide() {
     *) err "unsupported package format: ${_package_url}" ;;
     esac
 
-    local _package="zoxide.${_ext}"
+    local _package="querypath.${_ext}"
     case "${_dld}" in
     curl) _releases="$(curl -sLo "${_package}" "${_package_url}")" || err "curl: failed to download ${_package_url}" ;;
     wget) _releases="$(wget -qO "${_package}" "${_package_url}")" || err "wget: failed to download ${_package_url}" ;;
