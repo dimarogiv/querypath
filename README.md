@@ -216,7 +216,7 @@ querypath can be installed in 4 easy steps:
    > Add this to the <ins>**end**</ins> of your config file (usually `~/.bashrc`):
    >
    > ```sh
-   > eval "$(querypath init bash)"
+   > eval "$(querypath init --cmd q bash)"
    > ```
 
    </details>
@@ -227,7 +227,7 @@ querypath can be installed in 4 easy steps:
    > Add this to the <ins>**end**</ins> of your config file (usually `~/.elvish/rc.elv`):
    >
    > ```sh
-   > eval (querypath init elvish | slurp)
+   > eval (querypath init --cmd q elvish | slurp)
    > ```
    >
    > **Note**
@@ -242,7 +242,7 @@ querypath can be installed in 4 easy steps:
    > `~/.config/fish/config.fish`):
    >
    > ```sh
-   > querypath init fish | source
+   > querypath init --cmd q fish | source
    > ```
 
    </details>
@@ -254,7 +254,7 @@ querypath can be installed in 4 easy steps:
    > in Nushell):
    >
    > ```sh
-   > querypath init nushell | save -f ~/.querypath.nu
+   > querypath init --cmd q nushell | save -f ~/.querypath.nu
    > ```
    >
    > Now, add this to the <ins>**end**</ins> of your config file (find it by running
@@ -276,7 +276,7 @@ querypath can be installed in 4 easy steps:
    > `echo $profile` in PowerShell):
    >
    > ```powershell
-   > Invoke-Expression (& { (querypath init powershell | Out-String) })
+   > Invoke-Expression (& { (querypath init --cmd q powershell | Out-String) })
    > ```
 
    </details>
@@ -287,7 +287,7 @@ querypath can be installed in 4 easy steps:
    > Add this to the <ins>**end**</ins> of your config file (usually `~/.tcshrc`):
    >
    > ```sh
-   > querypath init tcsh > ~/.querypath.tcsh
+   > querypath init --cmd q tcsh > ~/.querypath.tcsh
    > source ~/.querypath.tcsh
    > ```
 
@@ -299,7 +299,7 @@ querypath can be installed in 4 easy steps:
    > Add this to the <ins>**end**</ins> of your config file (usually `~/.xonshrc`):
    >
    > ```python
-   > execx($(querypath init xonsh), 'exec', __xonsh__.ctx, filename='querypath')
+   > execx($(querypath init --cmd q xonsh), 'exec', __xonsh__.ctx, filename='querypath')
    > ```
 
    </details>
@@ -310,7 +310,7 @@ querypath can be installed in 4 easy steps:
    > Add this to the <ins>**end**</ins> of your config file (usually `~/.zshrc`):
    >
    > ```sh
-   > eval "$(querypath init zsh)"
+   > eval "$(querypath init --cmd q zsh)"
    > ```
    >
    > For completions to work, the above line must be added _after_ `compinit` is
@@ -325,7 +325,7 @@ querypath can be installed in 4 easy steps:
    > Add this to the <ins>**end**</ins> of your config file:
    >
    > ```sh
-   > eval "$(querypath init posix --hook prompt)"
+   > eval "$(querypath init --cmd q posix --hook prompt)"
    > ```
 
    </details>
@@ -401,7 +401,7 @@ querypath can be installed in 4 easy steps:
 
 ### Flags
 
-When calling `querypath init`, the following flags are available:
+When calling `querypath init --cmd q`, the following flags are available:
 
 - `--cmd`
   - Changes the prefix of the `z` and `zi` commands.
@@ -424,7 +424,7 @@ When calling `querypath init`, the following flags are available:
 ### Environment variables
 
 Environment variables[^2] can be used for configuration. They must be set before
-`querypath init` is called.
+`querypath init --cmd q` is called.
 
 - `_QP_DATA_DIR`
   - Specifies the directory in which the database is stored.
