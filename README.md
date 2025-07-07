@@ -46,18 +46,18 @@ querypath works on all major shells.
 ![Tutorial][tutorial]
 
 ```sh
-z foo              # cd into highest ranked directory matching foo
-z foo bar          # cd into highest ranked directory matching foo and bar
-z foo /            # cd into a subdirectory starting with foo
+q foo              # cd into highest ranked directory matching foo
+q foo bar          # cd into highest ranked directory matching foo and bar
+q foo /            # cd into a subdirectory starting with foo
 
-z ~/foo            # z also works like a regular cd command
-z foo/             # cd into relative path
-z ..               # cd one level up
-z -                # cd into previous directory
+q ~/foo            # z also works like a regular cd command
+q foo/             # cd into relative path
+q ..               # cd one level up
+q -                # cd into previous directory
 
-zi foo             # cd with interactive selection (using fzf)
+qi foo             # cd with interactive selection (using fzf)
 
-z foo<SPACE><TAB>  # show interactive completions (querypath v0.8.0+, bash 4.4+/fish/zsh only)
+q foo<SPACE><TAB>  # show interactive completions (querypath v0.8.0+, bash 4.4+/fish/zsh only)
 ```
 
 Read more about the matching algorithm [here][algorithm-matching].
