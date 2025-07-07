@@ -3,77 +3,8 @@
 
 # shellcheck shell=bash
 
-{{ section }}
-# Utility functions for querypath.
-#
-
-# pwd based on the value of _QP_RESOLVE_SYMLINKS.
-function __querypath_pwd() {
-{%- if cfg!(windows) %}
-    \command cygpath -w "$(\builtin pwd -P)"
-{%- else if resolve_symlinks %}
-    \builtin pwd -P
-{%- else %}
-    \builtin pwd -L
-{%- endif %}
-}
-
-# cd + custom logic based on the value of _QP_ECHO.
-function __querypath_cd() {
-    # shellcheck disable=SC2164
-    \builtin cd -- "$@" {%- if echo %} && __querypath_pwd {%- endif %}
-}
-
-{{ section }}
-# Hook configuration for querypath.
-#
-
-# Hook to add new entries to the database.
-function __querypath_hook() {
-    # shellcheck disable=SC2312
-    \command querypath add -- "$(__querypath_pwd)"
-}
-
-# Initialize hook.
-\builtin typeset -ga precmd_functions
-\builtin typeset -ga chpwd_functions
 # shellcheck disable=SC2034,SC2296
-precmd_functions=("${(@)precmd_functions:#__querypath_hook}")
 # shellcheck disable=SC2034,SC2296
-chpwd_functions=("${(@)chpwd_functions:#__querypath_hook}")
-
-{%- if hook == InitHook::Prompt %}
-precmd_functions+=(__querypath_hook)
-{%- else if hook == InitHook::Pwd %}
-chpwd_functions+=(__querypath_hook)
-{%- endif %}
-
-# Report common issues.
-function __querypath_doctor() {
-{%- if hook == InitHook::None %}
-    return 0
-
-{%- else %}
-    [[ ${_QP_DOCTOR:-1} -ne 0 ]] || return 0
-
-{%- if hook == InitHook::Prompt %}
-    [[ ${precmd_functions[(Ie)__querypath_hook]:-} -eq 0 ]] || return 0
-{%- else if hook == InitHook::Pwd %}
-    [[ ${chpwd_functions[(Ie)__querypath_hook]:-} -eq 0 ]] || return 0
-{%- endif %}
-
-    _QP_DOCTOR=0
-    \builtin printf '%s\n' \
-        'querypath: detected a possible configuration issue.' \
-        'Please ensure that querypath is initialized right at the end of your shell configuration file (usually ~/.zshrc).' \
-        '' \
-        'If the issue persists, consider filing an issue at:' \
-        'https://github.com/dimarogiv/querypath/issues' \
-        '' \
-        'Disable this message by setting _QP_DOCTOR=0.' \
-        '' >&2
-{%- endif %}
-}
 
 {{ section }}
 # When using querypath with --no-cmd, alias these internal functions as desired.
@@ -81,25 +12,22 @@ function __querypath_doctor() {
 
 # Jump to a directory using only keywords.
 function __querypath_z() {
-    __querypath_doctor
-    if [[ "$#" -eq 0 ]]; then
-        __querypath_cd ~
-    elif [[ "$#" -eq 1 ]] && { [[ -d "$1" ]] || [[ "$1" = '-' ]] || [[ "$1" =~ ^[-+][0-9]+$ ]]; }; then
-        __querypath_cd "$1"
-    elif [[ "$#" -eq 2 ]] && [[ "$1" = "--" ]]; then
-        __querypath_cd "$2"
-    else
-        \builtin local result
-        # shellcheck disable=SC2312
-        result="$(\command querypath query --exclude "$(__querypath_pwd)" -- "$@")" && __querypath_cd "${result}"
-    fi
+  if ! {[[ $# -eq 1 ]] && [[ -e "$@" ]]}
+  then
+    result="$(\command querypath query -- $@)"
+  elif [[ $# -eq 1 ]]
+  then
+    result="$1"
+  fi
+  [[ -z "$result" ]] && echo "Error: result is not assigned!" >&2
+  echo "$result"
+  \command querypath add -- "$result"
 }
 
 # Jump to a directory using interactive search.
 function __querypath_zi() {
-    __querypath_doctor
     \builtin local result
-    result="$(\command querypath query --interactive -- "$@")" && __querypath_cd "${result}"
+    result="$(\command querypath query --interactive -- "$@")" && echo "${result}"
 }
 
 {{ section }}
@@ -119,7 +47,13 @@ function {{ cmd }}i() {
 
 {%- when None %}
 
-{{ not_configured }}
+function q() {
+    __querypath_z "$@"
+}
+
+function qi() {
+    __querypath_zi "$@"
+}
 
 {%- endmatch %}
 
