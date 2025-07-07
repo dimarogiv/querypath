@@ -86,7 +86,8 @@ T}
 .TE
 .sp
 By default, this is set to \fB$HOME\fR. After setting this up, you might need
-to use \fBquerypath-remove\fR(1) to remove any existing entries from the database.
+to use \fBquerypath-remove\fR(1) to remove any existing entries from the
+database.
 .TP
 .B _QP_FZF_OPTS
 Custom options to pass to \fBfzf\fR(1) during interactive selection. See the
@@ -102,9 +103,9 @@ the database.
 .SH ALGORITHM
 .TP
 .B AGING
-querypath uses a parameter called \fB_QP_MAXAGE\fR to limit the number of entries
-in the database based on usage patterns. If the total \fBFRECENCY\fR of the
-directories in the database exceeds this value, we divide each directory's
+querypath uses a parameter called \fB_QP_MAXAGE\fR to limit the number of
+entries in the database based on usage patterns. If the total \fBFRECENCY\fR of
+the directories in the database exceeds this value, we divide each directory's
 score by a factor \fBk\fR - such that the new total becomes ~90% of
 \fB_QP_MAXAGE\fR. Thereafter, if the new score of any directory falls below
 1, it is removed from the database.
