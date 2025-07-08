@@ -11,7 +11,7 @@ __querypath_z_prefix='z#'
 
 # Jump to a directory using only keywords.
 function __querypath_z() {
-  if ! {[[ $# -eq 1 ]] && [[ -e "$@" ]]}
+  if ! ([[ $# -eq 1 ]] && [[ -e "$@" ]])
   then
     result="$(\command querypath query -- $@)"
   elif [[ $# -eq 1 ]]
