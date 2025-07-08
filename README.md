@@ -1,12 +1,3 @@
-<!-- markdownlint-configure-file {
-  "MD013": {
-    "code_blocks": false,
-    "tables": false
-  },
-  "MD033": false,
-  "MD041": false
-} -->
-
 # querypath
 
 [![crates.io][crates.io-badge]][crates.io]
@@ -26,8 +17,6 @@ them in just a few keystrokes.<br />
 </div>
 
 ## Getting started
-
-![Tutorial][tutorial]
 
 ```sh
 cat $(q ~/.config/nvim/init.lua) # `cat` `init.lua` while adding a new entry into the database
