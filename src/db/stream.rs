@@ -89,7 +89,7 @@ impl<'a> Stream<'a> {
         // the database.
         let resolver =
             if self.options.resolve_symlinks { fs::symlink_metadata } else { fs::metadata };
-        resolver(path).map(|metadata| metadata.is_dir()).unwrap_or_default()
+        resolver(path).map(|metadata| metadata.is_dir() || metadata.is_file() || metadata.is_symlink()).unwrap_or_default()
     }
 }
 
