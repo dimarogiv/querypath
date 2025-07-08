@@ -30,12 +30,6 @@ vim $(qi foo)      # choose file with interactive selection (using fzf) before e
 q foo<SPACE><TAB>  # show interactive completions (querypath v0.8.0+, bash 4.4+/fish/zsh only)
 ```
 
-Read more about the matching algorithm [here][algorithm-matching].
-
-<a href="https://app.warp.dev/drive/folder/querypath-EyHNpQumHVWNcYB8GJgDxG?utm_source=github&utm_medium=warp_pack&utm_campaign=querypath_20231001">
-  <img src="contrib/warp-packs-green.png" alt="Follow tutorial in Warp">
-</a>
-
 ## Installation
 
 querypath can be installed in 4 easy steps:
