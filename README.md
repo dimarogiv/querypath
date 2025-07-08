@@ -1,9 +1,5 @@
 # querypath
 
-[![crates.io][crates.io-badge]][crates.io]
-[![Downloads][downloads-badge]][releases]
-[![Built with Nix][builtwithnix-badge]][builtwithnix]
-
 querypath is a **path matcher**, forked from [https://github.com/ajeetdsouza/zoxide](zoxide).
 
 It remembers which paths you use most frequently, so you can match
@@ -13,8 +9,6 @@ them in just a few keystrokes.<br />
 [Installation](#installation) •
 [Configuration](#configuration) •
 [Integrations](#third-party-integrations)
-
-</div>
 
 ## Getting started
 
