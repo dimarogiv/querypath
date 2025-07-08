@@ -10,7 +10,7 @@ name = "querypath"
 readme = "README.md"
 repository = "https://github.com/dimarogiv/querypath"
 rust-version = "1.85.0"
-version = "1.0.0"
+version = "1.0.1"
 
 [badges]
 maintenance = { status = "actively-developed" }

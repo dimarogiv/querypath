@@ -4,88 +4,6 @@
 # shellcheck shell=bash
 
 {{ section }}
-# Utility functions for querypath.
-#
-
-# pwd based on the value of _QP_RESOLVE_SYMLINKS.
-function __querypath_pwd() {
-{%- if cfg!(windows) %}
-    \command cygpath -w "$(\builtin pwd -P)"
-{%- else if resolve_symlinks %}
-    \builtin pwd -P
-{%- else %}
-    \builtin pwd -L
-{%- endif %}
-}
-
-# cd + custom logic based on the value of _QP_ECHO.
-function __querypath_cd() {
-    # shellcheck disable=SC2164
-    \builtin cd -- "$@" {%- if echo %} && __querypath_pwd {%- endif %}
-}
-
-{{ section }}
-# Hook configuration for querypath.
-#
-{%- if hook != InitHook::None %}
-
-# Hook to add new entries to the database.
-{%- if hook == InitHook::Prompt %}
-function __querypath_hook() {
-    \builtin local -r retval="$?"
-    # shellcheck disable=SC2312
-    \command querypath add -- "$(__querypath_pwd)"
-    return "${retval}"
-}
-
-{%- else if hook == InitHook::Pwd %}
-__querypath_oldpwd="$(__querypath_pwd)"
-
-function __querypath_hook() {
-    \builtin local -r retval="$?"
-    \builtin local pwd_tmp
-    pwd_tmp="$(__querypath_pwd)"
-    if [[ ${__querypath_oldpwd} != "${pwd_tmp}" ]]; then
-        __querypath_oldpwd="${pwd_tmp}"
-        \command querypath add -- "${__querypath_oldpwd}"
-    fi
-    return "${retval}"
-}
-{%- endif %}
-
-# Initialize hook.
-if [[ ${PROMPT_COMMAND:=} != *'__querypath_hook'* ]]; then
-    PROMPT_COMMAND="__querypath_hook;${PROMPT_COMMAND#;}"
-fi
-
-{%- endif %}
-
-# Report common issues.
-function __querypath_doctor() {
-{%- if hook == InitHook::None %}
-    return 0
-
-{%- else %}
-    [[ ${_QP_DOCTOR:-1} -eq 0 ]] && return 0
-    # shellcheck disable=SC2199
-    [[ ${PROMPT_COMMAND[@]:-} == *'__querypath_hook'* ]] && return 0
-    # shellcheck disable=SC2199
-    [[ ${__vsc_original_prompt_command[@]:-} == *'__querypath_hook'* ]] && return 0
-
-    _QP_DOCTOR=0
-    \builtin printf '%s\n' \
-        'querypath: detected a possible configuration issue.' \
-        'Please ensure that querypath is initialized right at the end of your shell configuration file (usually ~/.bashrc).' \
-        '' \
-        'If the issue persists, consider filing an issue at:' \
-        'https://github.com/dimarogiv/querypath/issues' \
-        '' \
-        'Disable this message by setting _QP_DOCTOR=0.' \
-        '' >&2
-{%- endif %}
-}
-
-{{ section }}
 # When using querypath with --no-cmd, alias these internal functions as desired.
 #
 
@@ -93,34 +11,22 @@ __querypath_z_prefix='z#'
 
 # Jump to a directory using only keywords.
 function __querypath_z() {
-    __querypath_doctor
-
-    # shellcheck disable=SC2199
-    if [[ $# -eq 0 ]]; then
-        __querypath_cd ~
-    elif [[ $# -eq 1 && $1 == '-' ]]; then
-        __querypath_cd "${OLDPWD}"
-    elif [[ $# -eq 1 && -d $1 ]]; then
-        __querypath_cd "$1"
-    elif [[ $# -eq 2 && $1 == '--' ]]; then
-        __querypath_cd "$2"
-    elif [[ ${@: -1} == "${__querypath_z_prefix}"?* ]]; then
-        # shellcheck disable=SC2124
-        \builtin local result="${@: -1}"
-        __querypath_cd "{{ "${result:${#__querypath_z_prefix}}" }}"
-    else
-        \builtin local result
-        # shellcheck disable=SC2312
-        result="$(\command querypath query --exclude "$(__querypath_pwd)" -- "$@")" &&
-            __querypath_cd "${result}"
-    fi
+  if ! {[[ $# -eq 1 ]] && [[ -e "$@" ]]}
+  then
+    result="$(\command querypath query -- $@)"
+  elif [[ $# -eq 1 ]]
+  then
+    result="$1"
+  fi
+  [[ -z "$result" ]] && echo "Error: result is not assigned!" >&2
+  echo "$result"
+  \command querypath add -- "$result"
 }
 
 # Jump to a directory using interactive search.
 function __querypath_zi() {
-    __querypath_doctor
     \builtin local result
-    result="$(\command querypath query --interactive -- "$@")" && __querypath_cd "${result}"
+    result="$(\command querypath query --interactive -- "$@")" && echo "${result}"
 }
 
 {{ section }}
@@ -167,7 +73,7 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
         # If there is a space after the last word, use interactive selection.
         elif [[ -z ${COMP_WORDS[-1]} ]]; then
             # shellcheck disable=SC2312
-            __querypath_result="$(\command querypath query --exclude "$(__querypath_pwd)" --interactive -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" && {
+            __querypath_result="$(\command querypath query --interactive -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" && {
                 # In case the terminal does not respond to \e[5n or another
                 # mechanism steals the response, it is still worth completing
                 # the directory in the command line.
