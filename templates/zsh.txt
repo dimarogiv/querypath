@@ -12,16 +12,16 @@
 
 # Jump to a directory using only keywords.
 function __querypath_z() {
-  if ! {[[ $# -eq 1 ]] && [[ -e "$@" ]]}
+  if ! (echo $@ | grep '^./\|^/\|^~' -q) && ([[ $# -gt 1 ]] || ([[ $# -eq 1 ]] && ! [[ -e ${@[$#]} ]]))
   then
-    result="$(\command querypath query -- $@)"
+    result="$(\command zoxide query -- $@)"
   elif [[ $# -eq 1 ]]
   then
     result="$1"
   fi
-  [[ -z "$result" ]] && echo "Error: result is not assigned!" >&2
+  [[ -z "$result" ]] && echo "Error: result is not assigned!" >&2 && exit 1
   echo "$result"
-  \command querypath add -- "$result"
+  \command zoxide add -- "$result"
 }
 
 # Jump to a directory using interactive search.
