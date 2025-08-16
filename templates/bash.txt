@@ -13,14 +13,14 @@ __querypath_z_prefix='z#'
 function __querypath_z() {
   if ! (echo $@ | grep '^./\|^/\|^~' -q) && ([[ $# -gt 1 ]] || ([[ $# -eq 1 ]] && ! [[ -e ${@[$#]} ]]))
   then
-    result="$(\command zoxide query -- $@)"
+    result="$(\command querypath query -- $@)"
   elif [[ $# -eq 1 ]]
   then
     result="$1"
   fi
   [[ -z "$result" ]] && echo "Error: result is not assigned!" >&2 && exit 1
   echo "$result"
-  \command zoxide add -- "$result"
+  \command querypath add -- "$result"
 }
 
 # Jump to a directory using interactive search.
